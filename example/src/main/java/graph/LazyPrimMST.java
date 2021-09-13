@@ -8,8 +8,17 @@ import java.util.Queue;
 
 public class LazyPrimMST {
 
+    /**
+     * 标记最小生成树的节点
+     */
     private boolean[] marked;
+    /**
+     * 最小生成树的边
+     */
     private Queue<Edge> mst;
+    /**
+     * 存储图节点连接边的队列
+     */
     private PriorityQueue<Edge> priorityQueue;
 
     public LazyPrimMST(Graph graph) {
