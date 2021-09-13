@@ -13,7 +13,7 @@ public class LazyPrimMST {
      */
     private boolean[] marked;
     /**
-     * 最小生成树的边
+     * 存储最小生成树边的队列
      */
     private Queue<Edge> mst;
     /**
