@@ -61,7 +61,6 @@ public class LazyPrimMST {
         }
     }
 
-
     public static void main(String[] args) {
         Graph graph = new Graph(8);
         graph.addEdge(0, 1, 3);
