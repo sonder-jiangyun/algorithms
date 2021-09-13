@@ -5,43 +5,23 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/**
+ * leetcode 1584
+ * https://leetcode-cn.com/problems/min-cost-to-connect-all-points/
+ * 最小生成树
+ */
+public class TestPrimMST {
 
-public class LazyPrimMST {
+    public int minCostConnectPoints(int[][] points) {
+        Graph graph = this.convert(points);
+        //最小生成树的节点
+        boolean[] marked = new boolean[graph.v];
+        //存储最小生成树边的队列
+        Queue<Edge> mst = new LinkedList<>();
+        //存储图节点连接边的队列
+        PriorityQueue<Edge> priorityQueue = new PriorityQueue<>((Comparator.comparingInt(o -> o.weight)));
 
-    /**
-     * 标记最小生成树的节点
-     */
-    private boolean[] marked;
-    /**
-     * 存储最小生成树边的队列
-     */
-    private Queue<Edge> mst;
-    /**
-     * 存储图节点连接边的队列
-     */
-    private PriorityQueue<Edge> priorityQueue;
-
-    public static void main(String[] args) {
-        Graph graph = new Graph(8);
-        graph.addEdge(0, 1, 3);
-        graph.addEdge(0, 3, 5);
-        graph.addEdge(1, 2, 4);
-        graph.addEdge(1, 4, 7);
-        graph.addEdge(2, 5, 2);
-        graph.addEdge(4, 5, 8);
-        graph.addEdge(4, 6, 3);
-        graph.addEdge(5, 7, 3);
-        graph.addEdge(6, 7, 4);
-
-        LazyPrimMST lazyPrimMST = new LazyPrimMST(graph);
-        System.out.println(lazyPrimMST.getWeightSum());
-    }
-
-    public LazyPrimMST(Graph graph) {
-        priorityQueue = new PriorityQueue<>(graph.E, (Comparator.comparingInt(o -> o.weight)));
-        marked = new boolean[graph.v];
-        mst = new LinkedList<>();
-        visit(graph, 0);
+        visit(graph, 0, marked, priorityQueue);
         while (!priorityQueue.isEmpty()) {
             Edge edge = priorityQueue.poll();
             int v = edge.either();
@@ -50,16 +30,29 @@ public class LazyPrimMST {
                 continue;
             }
             mst.add(edge);
-            if (!marked[v]) {
-                visit(graph, v);
-            }
-            if (!marked[w]) {
-                visit(graph, w);
-            }
+            int visitNode = !marked[v] ? v : w;
+            visit(graph, visitNode, marked, priorityQueue);
         }
+        return this.getWeightSum(mst);
     }
 
-    public int getWeightSum() {
+    private Graph convert(int[][] points) {
+        int number = points.length;
+        Graph graph = new Graph(number);
+        for (int i = 1; i < points.length; i++) {
+            int currentX = points[i][0];
+            int currentY = points[i][1];
+            for (int j = 0; j < i; j++) {
+                int tempX = points[j][0];
+                int tempY = points[j][1];
+                int val = Math.abs(currentX - tempX) + Math.abs(currentY - tempY);
+                graph.addEdge(j, i, val);
+            }
+        }
+        return graph;
+    }
+
+    private int getWeightSum(Queue<Edge> mst) {
         int result = 0;
         for (Edge edge : mst) {
             result += edge.weight;
@@ -67,7 +60,7 @@ public class LazyPrimMST {
         return result;
     }
 
-    private void visit(Graph graph, int v) {
+    private void visit(Graph graph, int v, boolean[] marked, PriorityQueue<Edge> priorityQueue) {
         marked[v] = true;
         for (Edge edge : graph.adjacency[v]) {
             if (!marked[edge.other(v)]) {
@@ -75,6 +68,7 @@ public class LazyPrimMST {
             }
         }
     }
+
 
     /**
      * 图的邻接表存储
@@ -97,21 +91,6 @@ public class LazyPrimMST {
             adjacency[v].add(edge);
             adjacency[w].add(edge);
             E++;
-        }
-
-        /**
-         * @return 加权图中的所有边
-         */
-        public Iterable<Edge> edges() {
-            LinkedList<Edge> edges = new LinkedList<>();
-            for (int v = 0; v < this.v; v++) {
-                for (Edge edge : this.adjacency[v]) {
-                    if (edge.other(v) > v) {
-                        edges.add(edge);
-                    }
-                }
-            }
-            return edges;
         }
     }
 
