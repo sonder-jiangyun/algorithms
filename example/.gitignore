@@ -2,3 +2,4 @@
 target/
 *iml
 *.flattened-pom.xml
+*.idea/checkstyle-idea.xml
